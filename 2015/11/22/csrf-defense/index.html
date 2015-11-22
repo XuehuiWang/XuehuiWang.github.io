@@ -4,12 +4,13 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>@transactional | play a litle more!</title>
+    <title>csrf defense | play a litle more!</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
     
     <meta name="author" content="windpuller">
     
-    <meta name="description" content="在＠Transactional注解的程序块中调用未使用＠Transactional注解的方法，则事务将在未被注解的方法中继续生效。在未被注解的方法中，继续使用事务中的数据库连接，该方法中的任何异常都会引起事务的回滚。在＠Transactional注解的程序块中调用使用＠Transactional注解">
+    <meta name="description" content="本文仅用来自己备忘，更详细内容请阅读原文。
+防止csrf攻击的常用方法1. HTTP Reference原理：检查HTTP Reference的地址，判定请求的来源。缺点：低版本浏览器（IE6等）可以篡改HTTP Reference，达不到防御效果；较新的浏览器允许用户关闭HTTP Referenc">
     
     
     
@@ -69,15 +70,15 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2015/11/08/transactional/" title="@transactional" itemprop="url">@transactional</a>
+      <a href="/2015/11/22/csrf-defense/" title="csrf defense" itemprop="url">csrf defense</a>
   </h1>
   <p class="article-author">By
     
       <a href="http://yoursite.com" title="windpuller">windpuller</a>
     </p>
   <p class="article-time">
-    <time datetime="2015-11-08T03:36:44.000Z" itemprop="datePublished">2015-11-08</time>
-    更新日期:<time datetime="2015-11-08T08:19:07.594Z" itemprop="dateModified">2015-11-08</time>
+    <time datetime="2015-11-22T06:39:32.000Z" itemprop="datePublished">2015-11-22</time>
+    更新日期:<time datetime="2015-11-22T08:05:01.914Z" itemprop="dateModified">2015-11-22</time>
     
   </p>
 </header>
@@ -87,17 +88,21 @@
 		
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">文章目錄</strong>
-		
+		<ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#防止csrf攻击的常用方法"><span class="toc-number">1.</span> <span class="toc-text">防止csrf攻击的常用方法</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-_HTTP_Reference"><span class="toc-number">1.1.</span> <span class="toc-text">1. HTTP Reference</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-_url中添加token参数"><span class="toc-number">1.2.</span> <span class="toc-text">2. url中添加token参数</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-_HTTP协议头部添加自定义属性"><span class="toc-number">1.3.</span> <span class="toc-text">3. HTTP协议头部添加自定义属性</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#推荐的防御方式"><span class="toc-number">2.</span> <span class="toc-text">推荐的防御方式</span></a></li></ol>
 		</div>
 		
-		<p>在<code>＠Transactional</code>注解的程序块中调用未使用<code>＠Transactional</code>注解的方法，则事务将在未被注解的方法中继续生效。在未被注解的方法中，继续使用事务中的数据库连接，该方法中的任何异常都会引起事务的回滚。<br>在<code>＠Transactional</code>注解的程序块中调用使用<code>＠Transactional</code>注解的方法，如果这两个方法属于同一个实例，那么事务在被调用的方法中不会生效；如果两个方法属于不同的实例，则事务在被调用的方法中继续生效。<br>同理，在一个实例内部，通过未被<code>＠Transactional</code>注解的方法调用被<code>＠Transactional</code>注解的方法，被调用方法的事务也不会生效。<br>之所以会出现以上现象，是受到Spring AOP机制的限制。<code>＠Transactional</code>注解使用的是Spring的AOP机制，AOP仅在外部实例调用被注解的方法时才会生效，在同一个实例中调用任何被注解的方法都只能调用到原生方法，而不是注解后生成的代理方法。<br>如果不得不在一个实例内部调用被<code>＠Transactional</code>注解的方法，需要在这个实例内部显示的注入自身类的实例，并通过这个被注入的实例调用被注解的方法，才能访问到代理方法使事务生效。示例如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="annotation">@Service</span>(<span class="string">"transactionalTestClass"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TransactionalTestClass</span> </span>&#123;</span><br><span class="line">    </span><br><span class="line">    <span class="annotation">@Resource</span>(<span class="string">"transactionalTestClass"</span>)</span><br><span class="line">    <span class="keyword">private</span> TransactionalTestClass transactionalTestClass;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">noTransactionalMethod</span><span class="params">()</span></span>&#123;</span><br><span class="line">        transactionalTestClass.transactionalMethod();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="annotation">@Transactional</span>(rollbackFor = Exception.class)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">transactionalMethod</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">//do somthing</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+		<p><em>本文仅用来自己备忘，更详细内容请<a href="https://www.ibm.com/developerworks/cn/web/1102_niugang_csrf/" target="_blank" rel="external">阅读原文</a>。</em></p>
+<h4 id="防止csrf攻击的常用方法">防止csrf攻击的常用方法</h4><h5 id="1-_HTTP_Reference">1. HTTP Reference</h5><p><strong>原理</strong>：检查HTTP Reference的地址，判定请求的来源。<br><strong>缺点</strong>：低版本浏览器（IE6等）可以篡改HTTP Reference，达不到防御效果；较新的浏览器<br>允许用户关闭HTTP Reference的使用，致使用户的正常请求也不能通过。</p>
+<h5 id="2-_url中添加token参数">2. url中添加token参数</h5><p><strong>原理</strong>：检查请求url中的token值是否是合法的。<br><strong>缺点</strong>：所有请求地址中添加token字段，实现起来较复杂；url中的token很容易被攻击者获取到。</p>
+<h5 id="3-_HTTP协议头部添加自定义属性">3. HTTP协议头部添加自定义属性</h5><p><strong>原理</strong>：检查HTTP头部的csrfToken字段值是否合法。<br><strong>缺点</strong>：要使用XMLHttpRequest一次性给该类的所有请求添加csrfToken字段，而XMLHttpRequest<br>的使用局限性很大，并非所有的请求都适合由XMLHttpRequest发起，使用XMLHttpRequest请求到<br>的页面不能被浏览器记录，给用户带来不便。</p>
+<h4 id="推荐的防御方式">推荐的防御方式</h4><p>2+3, 对于安全性要求没那么高的请求，可以采用在url中添加token参数的方法防御<br>csrf，对于安全性要求比较高的请求，则使用在HTTP协议头部添加csrfToken的方式。</p>
   
 	</div>
 		<footer class="article-footer clearfix">
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/java/">java</a><a href="/tags/spring/">spring</a><a href="/tags/transactional/">transactional</a>
+  <span></span> <a href="/tags/csrf/">csrf</a>
   </div>
 
 
@@ -105,7 +110,7 @@
 
 <div class="article-share" id="share">
 
-  <div data-url="http://yoursite.com/2015/11/08/transactional/" data-title="@transactional | play a litle more!" data-tsina="null" class="share clearfix">
+  <div data-url="http://yoursite.com/2015/11/22/csrf-defense/" data-title="csrf defense | play a litle more!" data-tsina="null" class="share clearfix">
   </div>
 
 </div>
@@ -114,19 +119,11 @@
 	
 <nav class="article-nav clearfix">
  
- <div class="prev" >
- <a href="/2015/11/22/csrf-defense/" title="csrf defense">
-  <strong>PREVIOUS:</strong><br/>
-  <span>
-  csrf defense</span>
-</a>
-</div>
-
 
 <div class="next">
-<a href="/2015/10/25/Spring-circular-dependency/"  title="Spring circular dependency">
+<a href="/2015/11/08/transactional/"  title="@transactional">
  <strong>NEXT:</strong><br/> 
- <span>Spring circular dependency
+ <span>@transactional
 </span>
 </a>
 </div>
@@ -139,7 +136,7 @@
 
   <div id="toc" class="toc-aside">
   <strong class="toc-title">文章目錄</strong>
-  
+  <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#防止csrf攻击的常用方法"><span class="toc-number">1.</span> <span class="toc-text">防止csrf攻击的常用方法</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-_HTTP_Reference"><span class="toc-number">1.1.</span> <span class="toc-text">1. HTTP Reference</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-_url中添加token参数"><span class="toc-number">1.2.</span> <span class="toc-text">2. url中添加token参数</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-_HTTP协议头部添加自定义属性"><span class="toc-number">1.3.</span> <span class="toc-text">3. HTTP协议头部添加自定义属性</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#推荐的防御方式"><span class="toc-number">2.</span> <span class="toc-text">推荐的防御方式</span></a></li></ol>
   </div>
 
 <div id="asidepart">
