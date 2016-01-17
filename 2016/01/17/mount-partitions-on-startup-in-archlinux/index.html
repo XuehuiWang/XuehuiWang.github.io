@@ -4,13 +4,13 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>csrf defense | play a litle more!</title>
+    <title>mount partitions on startup in archlinux | play a litle more!</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
     
     <meta name="author" content="windpuller">
     
-    <meta name="description" content="本文仅用来自己备忘，更详细内容请阅读原文。
-防止csrf攻击的常用方法1. HTTP Reference原理：检查HTTP Reference的地址，判定请求的来源。缺点：低版本浏览器（IE6等）可以篡改HTTP Reference，达不到防御效果；较新的浏览器允许用户关闭HTTP Referenc">
+    <meta name="description" content="机器装了两个系统，一个win7备用，一个linux生产。但是最近linux的剩余磁盘空间仅10G多，眼看就要不够用了，于是想着挤挤win7，分些空间出来给linux。
+grub rescue的处理第一步，先在win7中压缩了20G出来，然后重启机器准备进入linux加载新分区，此时出现了问题，gru">
     
     
     
@@ -70,15 +70,15 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2015/11/22/csrf-defense/" title="csrf defense" itemprop="url">csrf defense</a>
+      <a href="/2016/01/17/mount-partitions-on-startup-in-archlinux/" title="mount partitions on startup in archlinux" itemprop="url">mount partitions on startup in archlinux</a>
   </h1>
   <p class="article-author">By
     
       <a href="http://yoursite.com" title="windpuller">windpuller</a>
     </p>
   <p class="article-time">
-    <time datetime="2015-11-22T06:39:32.000Z" itemprop="datePublished">2015-11-22</time>
-    Updated:<time datetime="2015-11-22T08:05:01.914Z" itemprop="dateModified">2015-11-22</time>
+    <time datetime="2016-01-17T09:36:47.000Z" itemprop="datePublished">2016-01-17</time>
+    Updated:<time datetime="2016-01-17T12:08:22.637Z" itemprop="dateModified">2016-01-17</time>
     
   </p>
 </header>
@@ -88,21 +88,30 @@
 		
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">Contents</strong>
-		<ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#防止csrf攻击的常用方法"><span class="toc-number">1.</span> <span class="toc-text">防止csrf攻击的常用方法</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-_HTTP_Reference"><span class="toc-number">1.1.</span> <span class="toc-text">1. HTTP Reference</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-_url中添加token参数"><span class="toc-number">1.2.</span> <span class="toc-text">2. url中添加token参数</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-_HTTP协议头部添加自定义属性"><span class="toc-number">1.3.</span> <span class="toc-text">3. HTTP协议头部添加自定义属性</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#推荐的防御方式"><span class="toc-number">2.</span> <span class="toc-text">推荐的防御方式</span></a></li></ol>
+		<ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#grub_rescue的处理"><span class="toc-number">1.</span> <span class="toc-text">grub rescue的处理</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#archlinux挂载分区"><span class="toc-number">2.</span> <span class="toc-text">archlinux挂载分区</span></a></li></ol>
 		</div>
 		
-		<p><em>本文仅用来自己备忘，更详细内容请<a href="https://www.ibm.com/developerworks/cn/web/1102_niugang_csrf/" target="_blank" rel="external">阅读原文</a>。</em></p>
-<h4 id="防止csrf攻击的常用方法">防止csrf攻击的常用方法</h4><h5 id="1-_HTTP_Reference">1. HTTP Reference</h5><p><strong>原理</strong>：检查HTTP Reference的地址，判定请求的来源。<br><strong>缺点</strong>：低版本浏览器（IE6等）可以篡改HTTP Reference，达不到防御效果；较新的浏览器<br>允许用户关闭HTTP Reference的使用，致使用户的正常请求也不能通过。</p>
-<h5 id="2-_url中添加token参数">2. url中添加token参数</h5><p><strong>原理</strong>：检查请求url中的token值是否是合法的。<br><strong>缺点</strong>：所有请求地址中添加token字段，实现起来较复杂；url中的token很容易被攻击者获取到。</p>
-<h5 id="3-_HTTP协议头部添加自定义属性">3. HTTP协议头部添加自定义属性</h5><p><strong>原理</strong>：检查HTTP头部的csrfToken字段值是否合法。<br><strong>缺点</strong>：要使用XMLHttpRequest一次性给该类的所有请求添加csrfToken字段，而XMLHttpRequest<br>的使用局限性很大，并非所有的请求都适合由XMLHttpRequest发起，使用XMLHttpRequest请求到<br>的页面不能被浏览器记录，给用户带来不便。</p>
-<h4 id="推荐的防御方式">推荐的防御方式</h4><p>2+3, 对于安全性要求没那么高的请求，可以采用在url中添加token参数的方法防御<br>csrf，对于安全性要求比较高的请求，则使用在HTTP协议头部添加csrfToken的方式。</p>
+		<p>机器装了两个系统，一个win7备用，一个linux生产。但是最近linux的剩余磁盘空间仅10G多，<br>眼看就要不够用了，于是想着挤挤win7，分些空间出来给linux。</p>
+<h4 id="grub_rescue的处理">grub rescue的处理</h4><p>第一步，先在win7中压缩了20G出来，然后重启机器准备进入linux加载新分区，此时出现了<br>问题，grub无法正常启动，进入了rescue界面。<br>解决办法是：</p>
+<ol>
+<li>列出所有分区<br>grub rescue&gt; ls</li>
+<li>依次ls每个分区直到找到不报’unknown filesystem’的分区，比如n=5<br>grub rescue&gt; ls (hd0,msdos5)/boot/grub</li>
+<li>依次执行以下命令，可进入正常的系统引导界面<br>grub rescue&gt; set root=(hd0,msdos5)/boot/grub<br>grub rescue&gt; set prefix=(hd0,msdos5)/boot/grub<br>grub rescue&gt; insmod normal<br>grub rescue&gt; normal</li>
+<li>进入linux操作系统，执行以下命令修复grub，重启后grub可恢复正常<br>$ sudo grub-install /dev/sda</li>
+</ol>
+<h4 id="archlinux挂载分区">archlinux挂载分区</h4><p>第二步，配置新分区在linux启动的时候自动挂载，并映射到某一个文件路径，比如/extend</p>
+<ol>
+<li>找到要挂载的新分区硬盘号码，比如/dev/sda5<br>$ sudo fdisk -l</li>
+<li>格式化/dev/sda5为linux系统的文件格式(也可使用其它稳定的文件格式)<br>$ sudo mkfs.ext4 /dev/sda5</li>
+<li>配置新分区在系统启动的时候挂载，并映射为/extend<br>修改<code>/etc/fstab</code>文件，在最后添加一行，注意使用对应的UUID并修改加载顺序<br>UUID=59f8ba70-62d4-4d1d-982e-a33166d59394  /extend  ext4  rw,relatime,data=ordered   0 3</li>
+</ol>
   
 	</div>
 		<footer class="article-footer clearfix">
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/csrf/">csrf</a>
+  <span></span> <a href="/tags/archlinux/">archlinux</a><a href="/tags/grub-rescue/">grub rescue</a><a href="/tags/mount-partitions/">mount partitions</a>
   </div>
 
 
@@ -110,7 +119,7 @@
 
 <div class="article-share" id="share">
 
-  <div data-url="http://yoursite.com/2015/11/22/csrf-defense/" data-title="csrf defense | play a litle more!" data-tsina="null" class="share clearfix">
+  <div data-url="http://yoursite.com/2016/01/17/mount-partitions-on-startup-in-archlinux/" data-title="mount partitions on startup in archlinux | play a litle more!" data-tsina="null" class="share clearfix">
   </div>
 
 </div>
@@ -119,19 +128,11 @@
 	
 <nav class="article-nav clearfix">
  
- <div class="prev" >
- <a href="/2016/01/17/mount-partitions-on-startup-in-archlinux/" title="mount partitions on startup in archlinux">
-  <strong>PREVIOUS:</strong><br/>
-  <span>
-  mount partitions on startup in archlinux</span>
-</a>
-</div>
-
 
 <div class="next">
-<a href="/2015/11/08/transactional/"  title="@transactional">
+<a href="/2015/11/22/csrf-defense/"  title="csrf defense">
  <strong>NEXT:</strong><br/> 
- <span>@transactional
+ <span>csrf defense
 </span>
 </a>
 </div>
@@ -144,7 +145,7 @@
 
   <div id="toc" class="toc-aside">
   <strong class="toc-title">Contents</strong>
-  <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#防止csrf攻击的常用方法"><span class="toc-number">1.</span> <span class="toc-text">防止csrf攻击的常用方法</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-_HTTP_Reference"><span class="toc-number">1.1.</span> <span class="toc-text">1. HTTP Reference</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-_url中添加token参数"><span class="toc-number">1.2.</span> <span class="toc-text">2. url中添加token参数</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-_HTTP协议头部添加自定义属性"><span class="toc-number">1.3.</span> <span class="toc-text">3. HTTP协议头部添加自定义属性</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#推荐的防御方式"><span class="toc-number">2.</span> <span class="toc-text">推荐的防御方式</span></a></li></ol>
+  <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#grub_rescue的处理"><span class="toc-number">1.</span> <span class="toc-text">grub rescue的处理</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#archlinux挂载分区"><span class="toc-number">2.</span> <span class="toc-text">archlinux挂载分区</span></a></li></ol>
   </div>
 
 <div id="asidepart">
