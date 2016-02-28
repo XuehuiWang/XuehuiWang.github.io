@@ -2,6 +2,11 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://windpuller.github.io/blog/2016/02/28/cast-numeric-string-to-Integer-in-java/</loc>
+    <lastmod>2016-02-28T14:25:25.509Z</lastmod>
+  </url>
+  
+  <url>
     <loc>http://windpuller.github.io/blog/2015/09/24/git-base-commands/</loc>
     <lastmod>2016-02-03T06:57:59.528Z</lastmod>
   </url>
