@@ -5,7 +5,7 @@
   <link href="/blog/atom.xml" rel="self"/>
   
   <link href="http://windpuller.github.io/blog/"/>
-  <updated>2016-03-10T13:37:48.364Z</updated>
+  <updated>2016-05-17T10:26:22.369Z</updated>
   <id>http://windpuller.github.io/blog/</id>
   
   <author>
@@ -14,6 +14,28 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>RESTful note</title>
+    <link href="http://windpuller.github.io/blog/2016/05/17/RESTful-note/"/>
+    <id>http://windpuller.github.io/blog/2016/05/17/RESTful-note/</id>
+    <published>2016-05-17T10:14:51.000Z</published>
+    <updated>2016-05-17T10:26:22.369Z</updated>
+    
+    <content type="html">&lt;h2 id=&quot;1-RESTful&quot;&gt;&lt;a href=&quot;#1-RESTful&quot; class=&quot;headerlink&quot; title=&quot;1. RESTful&quot;&gt;&lt;/a&gt;1. RESTful&lt;/h2&gt;&lt;p&gt;RESTful，即Representational State Transfer的缩写，字面含义是&lt;strong&gt;表现层状态转化&lt;/strong&gt;。是某歪果仁博士提出的一种&lt;strong&gt;网络应用软件架构&lt;/strong&gt;风格。&lt;br&gt;根据&lt;a href=&quot;http://www.ruanyifeng.com/blog/2011/09/restful.html&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;理解RESTful架构&lt;/a&gt;的分析，RESTful的关键因素主要有三个：资源、表现层、状态转化。&lt;br&gt;(1) 资源&lt;br&gt;表现层依赖的实体，在网络中一般使用URI指定。可以是一张图片，也可以是一段文本。&lt;br&gt;(2) 表现层&lt;br&gt;资源的表现形式，是图片还是文本还是视频，应使用HTTP协议头部的Accept和Content-Type字段指定。&lt;br&gt;(3) 状态转化&lt;br&gt;client通过HTTP协议的GET、POST、PUT、DELETE等操作获取、创建、修改、删除服务器端的资源，并反映在client的展示中。&lt;/p&gt;
+&lt;h2 id=&quot;2-优势&quot;&gt;&lt;a href=&quot;#2-优势&quot; class=&quot;headerlink&quot; title=&quot;2. 优势&quot;&gt;&lt;/a&gt;2. 优势&lt;/h2&gt;&lt;p&gt;RESTful的优势主要体现在与传统C/S架构应用软件的对比上：&lt;br&gt;浏览器即客户端，客户端的开发难度和成本降低&lt;br&gt;仅在服务器端存在状态转化，有利于系统结构的拆分和扩展，有利于合理配置服务器资源&lt;br&gt;系统更新升级方便，向后兼容性好&lt;/p&gt;
+</content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;1-RESTful&quot;&gt;&lt;a href=&quot;#1-RESTful&quot; class=&quot;headerlink&quot; title=&quot;1. RESTful&quot;&gt;&lt;/a&gt;1. RESTful&lt;/h2&gt;&lt;p&gt;RESTful，即Representational State Transfer
+    
+    </summary>
+    
+    
+      <category term="restful" scheme="http://windpuller.github.io/blog/tags/restful/"/>
+    
+  </entry>
   
   <entry>
     <title>deserialize numeric string for map key in json</title>
@@ -141,9 +163,9 @@
     </summary>
     
     
-      <category term="java" scheme="http://windpuller.github.io/blog/tags/java/"/>
-    
       <category term="spring" scheme="http://windpuller.github.io/blog/tags/spring/"/>
+    
+      <category term="java" scheme="http://windpuller.github.io/blog/tags/java/"/>
     
       <category term="transactional" scheme="http://windpuller.github.io/blog/tags/transactional/"/>
     
@@ -172,11 +194,11 @@
     </summary>
     
     
-      <category term="java" scheme="http://windpuller.github.io/blog/tags/java/"/>
-    
       <category term="circular dependency" scheme="http://windpuller.github.io/blog/tags/circular-dependency/"/>
     
       <category term="spring" scheme="http://windpuller.github.io/blog/tags/spring/"/>
+    
+      <category term="java" scheme="http://windpuller.github.io/blog/tags/java/"/>
     
       <category term="inherited" scheme="http://windpuller.github.io/blog/tags/inherited/"/>
     
