@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://windpuller.github.io/blog/2018/08/10/Shutdown-spring-boot-embedded-jetty-servlet-container-gracefully/</loc>
+    
+    <lastmod>2018-08-10T03:38:43.008Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://windpuller.github.io/blog/2016/05/17/RESTful-note/</loc>
     
     <lastmod>2016-09-02T10:39:38.000Z</lastmod>
